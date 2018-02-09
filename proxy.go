@@ -3,6 +3,7 @@ package proxytools
 import (
 	"errors"
 	"fmt"
+	"net/http"
 	"strconv"
 	"strings"
 )
@@ -103,6 +104,20 @@ func ParseProxyFromUrl(urlString string) (*Proxy, error) {
 	return p, nil
 }
 
-// func HttpSetProxy(proxyUrl string) {
+func HttpSetSockProxy(client *http.Client, proxy Proxy) (*http.Client, error) {
+	client.Transport := Socks5Proxy {
+		
+	} 
+}
+func HttpSetProxy(client *http.Client, proxyUrl string) (*http.Client, error) {
+	proxy, err := ParseProxyFromUrl(proxyUrl)
+	if err != nil {
+		return nil, err
+	}
+	if proxy.proto == TYPE_SOCKS5 {
 
-// }
+	} else {
+
+	}
+	return client, nil
+}
