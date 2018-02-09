@@ -38,11 +38,11 @@ func (d *dialer) Dial(network, addr string) (net.Conn, error) {
 	return d.socks5.Dial(network, addr)
 }
 
-func Socks5Proxy(addr string) *http.Transport {
+func Socks5Proxy(addr string, user string, password string) *http.Transport {
 	d := &dialer{
 		addr:     addr,
-		User:     "",
-		Password: ""}
+		User:     user,
+		Password: password}
 	return &http.Transport{
 		DialContext: d.DialContext,
 		Dial:        d.Dial,

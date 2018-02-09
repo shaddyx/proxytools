@@ -104,18 +104,18 @@ func ParseProxyFromUrl(urlString string) (*Proxy, error) {
 	return p, nil
 }
 
-func HttpSetSockProxy(client *http.Client, proxy Proxy) (*http.Client, error) {
-	client.Transport := Socks5Proxy {
-		
-	} 
+func HttpSetSockProxy(client *http.Client, proxy Proxy) *http.Client {
+	client.Transport = Socks5Proxy(proxy.host, proxy.login, proxy.password)
+	return client
 }
+
 func HttpSetProxy(client *http.Client, proxyUrl string) (*http.Client, error) {
 	proxy, err := ParseProxyFromUrl(proxyUrl)
 	if err != nil {
 		return nil, err
 	}
 	if proxy.proto == TYPE_SOCKS5 {
-
+		client = HttpSetSockProxy(client, *proxy)
 	} else {
 
 	}
