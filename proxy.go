@@ -1,9 +1,12 @@
 package proxytools
 
 import (
+	"crypto/tls"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 )
@@ -12,6 +15,7 @@ const (
 	TYPE_SOCKS4 = "socks4"
 	TYPE_SOCKS5 = "socks5"
 	TYPE_HTTP   = "http"
+	TYPE_HTTPS  = "https"
 )
 
 type Proxy struct {
@@ -109,15 +113,33 @@ func HttpSetSockProxy(client *http.Client, proxy Proxy) *http.Client {
 	return client
 }
 
+func HttpSetHttpProxy(client *http.Client, proxy Proxy, protocol string) (*http.Client, error) {
+	proxyUrl, err := url.Parse(protocol + "//:" + proxy.host)
+	if err != nil {
+		return nil, err
+	}
+	client.Transport = &http.Transport{
+		Proxy:           http.ProxyURL(proxyUrl),
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	return client, nil
+}
 func HttpSetProxy(client *http.Client, proxyUrl string) (*http.Client, error) {
 	proxy, err := ParseProxyFromUrl(proxyUrl)
 	if err != nil {
 		return nil, err
 	}
-	if proxy.proto == TYPE_SOCKS5 {
+	if proxy.proto == TYPE_SOCKS5 || proxy.proto == TYPE_SOCKS4 {
 		client = HttpSetSockProxy(client, *proxy)
 	} else {
-
+		client, err = HttpSetHttpProxy(client, *proxy, proxy.proto)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if proxy.login != "" {
+		basicAuth := "Basic " + base64.StdEncoding.EncodeToString([]byte(proxy.login+":"+proxy.password))
+		client.Header.Add("Proxy-Authorization", basicAuth)
 	}
 	return client, nil
 }
