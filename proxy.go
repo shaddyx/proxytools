@@ -2,7 +2,6 @@ package proxytools
 
 import (
 	"crypto/tls"
-	"encoding/base64"
 	"errors"
 	"fmt"
 	"net/http"
@@ -138,8 +137,9 @@ func HttpSetProxy(client *http.Client, proxyUrl string) (*http.Client, error) {
 		}
 	}
 	if proxy.login != "" {
-		basicAuth := "Basic " + base64.StdEncoding.EncodeToString([]byte(proxy.login+":"+proxy.password))
-		client.Header.Add("Proxy-Authorization", basicAuth)
+		panic("http proxy auth not implemented yet")
+		//basicAuth := "Basic " + base64.StdEncoding.EncodeToString([]byte(proxy.login+":"+proxy.password))
+		//client.Header.Add("Proxy-Authorization", basicAuth)
 	}
 	return client, nil
 }

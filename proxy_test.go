@@ -2,6 +2,7 @@ package proxytools
 
 import (
 	"fmt"
+	"net/http"
 	"testing"
 )
 
@@ -62,4 +63,18 @@ func TestParseProxyFromUrlWithUnameLogin(t *testing.T) {
 		return
 	}
 	fmt.Println(p)
+}
+
+func TestProxyRequest(t *testing.T) {
+	proxy := "http://test@nnn.com:8889"
+	cli := http.Client{}
+	client, err := HttpSetProxy(&cli, proxy)
+	if err != nil {
+		t.Error(err)
+	}
+	data, err := client.Get("https://google.com")
+	if err != nil {
+		t.Error(err)
+	}
+	fmt.Println(data)
 }
